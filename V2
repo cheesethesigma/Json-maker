@@ -1,71 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bag JSON Creator</title>
+  <meta charset="UTF-8">
+  <title>Start Button</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
-    .hidden { display: none; }
-    input, select, button { display: block; margin: 10px 0; width: 100%; }
-    .bag-section { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    button {
+      font-size: 20px;
+      padding: 10px 20px;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 24px;
+      color: green;
+    }
   </style>
 </head>
 <body>
-  <button id="startBtn">Start</button>
-  <div id="bagContainer" class="hidden"></div>
-  <button onclick="generateJSON()" class="hidden" id="generateBtn">Generate JSON</button>
-  <pre id="output"></pre>
+  <button onclick="showMessage()">Click Me</button>
+  <div id="message"></div>
 
   <script>
-    const bagList = ["Large Blue Bag", "Medium Red Bag", "Small Green Bag"];
-    const itemList = ["Banana", "Laser Core", "Plasma Cell", "Nano Chip"]; // example items
-    let tas = 0; // used if qty per raygun is 200
-
-    document.getElementById("startBtn").addEventListener("click", () => {
-      const container = document.getElementById("bagContainer");
-      container.innerHTML = "";
-      bagList.forEach((bag, i) => {
-        const div = document.createElement("div");
-        div.className = "bag-section";
-        div.innerHTML = `
-          <h3>${bag}</h3>
-          <label>Rayguns for this bag (max 23):
-            <input type="number" min="1" max="23" value="1" class="raygun-count" data-bag="${i}">
-          </label>
-          <label>Item:
-            <input list="items" class="item-input" data-bag="${i}">
-            <datalist id="items">
-              ${itemList.map(item => `<option value="${item}">`).join("")}
-            </datalist>
-          </label>
-          <label>Amount per raygun (1–250):
-            <input type="number" min="1" max="250" class="qty-input" data-bag="${i}">
-          </label>
-        `;
-        container.appendChild(div);
-      });
-      container.classList.remove("hidden");
-      document.getElementById("generateBtn").classList.remove("hidden");
-    });
-
-    function generateJSON() {
-      const result = {};
-      document.querySelectorAll(".bag-section").forEach((section, i) => {
-        const bagName = bagList[i];
-        const raygunCount = parseInt(section.querySelector(".raygun-count").value);
-        const item = section.querySelector(".item-input").value;
-        const qty = parseInt(section.querySelector(".qty-input").value);
-
-        if (qty === 200) tas = qty;
-
-        result[bagName] = {
-          rayguns: raygunCount,
-          item: item,
-          quantityPerRaygun: qty
-        };
-      });
-
-      document.getElementById("output").textContent = JSON.stringify(result, null, 2);
+    function showMessage() {
+      document.getElementById("message").innerText = "Start";
     }
   </script>
 </body>
