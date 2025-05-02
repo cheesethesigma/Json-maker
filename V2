@@ -2,37 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bag JSON Creator</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-    button, select, input { margin: 10px 0; font-size: 16px; width: 100%; max-width: 100%; }
+    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
     .hidden { display: none; }
-    .bag-section, .item-section { margin-top: 20px; }
-    pre { background: #f3f3f3; padding: 10px; overflow: auto; }
+    input, select, button { display: block; margin: 10px 0; width: 100%; }
+    .bag-section { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
   </style>
 </head>
 <body>
   <button id="startBtn">Start</button>
-
-  <div id="bagContainer" class="bag-section hidden">
-    <h3>Select Bags</h3>
-    <div id="bags"></div>
-  </div>
-
-  <div id="itemContainer" class="item-section hidden">
-    <h3>Assign Items to Bags</h3>
-    <div id="items"></div>
-    <button onclick="generateJSON()">Generate JSON</button>
-    <pre id="output"></pre>
-  </div>
+  <div id="bagContainer" class="hidden"></div>
+  <button onclick="generateJSON()" class="hidden" id="generateBtn">Generate JSON</button>
+  <pre id="output"></pre>
 
   <script>
     const bagList = ["Large Blue Bag", "Medium Red Bag", "Small Green Bag"];
-    let raygunsWithChildren = [];
+    const itemList = ["Banana", "Laser Core", "Plasma Cell", "Nano Chip"]; // example items
+    let tas = 0; // used if qty per raygun is 200
 
-    document.getElementById('startBtn').addEventListener('click', async () => {
-      try {
-        const response = await fetch("https://percthirty.github.io/Animal-Company-ID-Tracker/data.json");
-        const data = await response.json();
-        ray
+    document.getElementById("startBtn").addEventListener("click", () => {
+      const container = document.getElementById("bagContainer");
+      container.innerHTML = "";
+      bagList.forEach((bag, i) => {
+        const div = document.createElement("div");
+        div.className = "bag-section";
+        div.innerHTML = `
+          <h3>${bag}</h3>
+          <label>Rayguns for this bag (max 23):
+            <input type="number" min="1" max="23" value="1" class="raygun-count" data-bag="${i}">
+          </label>
+          <label>Item:
+            <input list="items" class="item-input" data-bag="${i}">
+            <datalist id="items">
+              ${itemList.map(item => `<option value="${item}">`).join("")}
+            </datalist>
+          </label>
+          <label>Amount per raygun (1–250):
+            <input type="number" min="1" max="250" class="qty-input" data-bag="${i}">
+          </label>
+        `;
+        container.appendChild(div);
+      });
+      container.classList.remove("hidden");
+      document.getElementById("generateBtn").classList.remove("hidden");
+    });
+
+    function generateJSON() {
+      const result = {};
+      document.querySelectorAll(".bag-section").forEach((section, i) => {
+        const bagName = bagList[i];
+        const raygunCount = parseInt(section.querySelector(".raygun-count").value);
+        const item = section.querySelector(".item-input").value;
+        const qty = parseInt(section.querySelector(".qty-input").value);
+
+        if (qty === 200) tas = qty;
+
+        result[bagName] = {
+          rayguns: raygunCount,
+          item: item,
+          quantityPerRaygun: qty
+        };
+      });
+
+      document.getElementById("output").textContent = JSON.stringify(result, null, 2);
+    }
+  </script>
+</body>
+</html>
